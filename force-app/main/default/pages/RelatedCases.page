@@ -1,0 +1,29 @@
+<apex:page standardController="Account" extensions="OpenCases">
+    <apex:form >
+
+    <apex:pageMessages />
+
+
+        <apex:pageblock id="CustomList" title="Related Cases"  >
+
+            <apex:pageBlockTable value="{!cse}" var="c" rendered="{!NOT(ISNULL(cse))}">
+
+                <apex:column headerValue="Case Number" >
+
+                    <apex:outputLink value="/{!c.id}">{!c.CaseNumber}</apex:outputLink>
+
+                </apex:column>
+
+                <apex:column value="{!c.AccountId}"/>
+
+                <apex:column value="{!c.Type}"/>
+
+            </apex:pageBlockTable>
+
+            <apex:outputLabel value="No records to display" rendered="{!(ISNULL(cse))}" styleClass="noRowsHeader"></apex:outputLabel>
+
+        </apex:pageblock>
+
+    </apex:form>
+
+</apex:page>

@@ -1,0 +1,4 @@
+<aura:component controller="Symptom_check_code_server" implements="force:LightningQuickActionWithoutHeader,force:hasRecordId">
+<aura:attribute name="recordId" type="Id"/>	  
+<lightning:button label="Call server" onclick="{!c.onClick}"/>
+</aura:component>

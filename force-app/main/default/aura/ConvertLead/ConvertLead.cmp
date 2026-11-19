@@ -1,0 +1,137 @@
+<aura:component controller="ConvertLead_Class" implements="force:hasRecordId,force:lightningQuickAction">
+    <ltng:require styles="/resource/slds202/assets/styles/salesforce-lightning-design-system.css" />
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+   <aura:attribute name="selectedStatus" type="String"/>
+    <aura:attribute name="selecteduser" type="String"/>
+    <aura:attribute name="selectedacc" type="String"/>
+    <aura:attribute name="contactDetails" type="String"/>
+    <aura:attribute name="createOpty" type="Boolean" default="false"/>
+    <aura:attribute name="accError" type="Boolean"/>
+    <aura:attribute name="userCheck" type="Boolean"/>
+     <aura:attribute name="statusCheck" type="Boolean"/>
+    <aura:attribute name="disableOpty" type="Boolean" default="true"/>
+    <aura:attribute name="OptyName" type="String"/>
+    <aura:attribute name="selectedAccId" type="String" />
+    <aura:attribute name="selectedAccLabel" type="String" />
+    <aura:attribute name="selectedUserId" type="String" />
+    <aura:attribute name="selectedUserLabel" type="String" />
+    <aura:attribute name="emailCheck" type="Boolean" default="false"/>
+    <aura:attribute name="returnData" type="String" />
+    <aura:attribute name="isOpen" type="Boolean" />
+    <aura:attribute name="newAccButton" type="Boolean" default="false"/>
+     <aura:attribute name="contactCreated" type="String" />
+    <aura:attribute name="labelAcc" type="String" />
+    <aura:attribute name="newAcc" type="String" default="false"/>
+     <aura:attribute name="recordId" type="Id" />
+    <div >
+    
+    <ui:inputSelect aura:id="leadStatus" multiple="false" label="Converted Status" value="{!v.selectedStatus}" class="slds-input" >
+     </ui:inputSelect>
+        &nbsp;
+       <c:LookupSObject sObjectAPIName="User" label="Record Owner" instanceId="user" pluralLabel="Users" searchString="{!v.selecteduser}" required="true" selectedId="{!v.selectedUserId}" />
+    	&nbsp;
+              
+        <c:LookupSObject sObjectAPIName="Account" label="Account Search" instanceId="account" pluralLabel="Accounts" searchString="{!v.selectedacc}" selectedId="{!v.selectedAccId}" searchName="{!v.labelAcc}" accountName="{!v.selectedAccLabel}" createNewAcc="{!v.newAccButton}"/>
+
+        &nbsp;
+              <ui:inputCheckbox text="{!contactDetails}" label="Create Opportunity" aura:id="check1" value="" change="{!c.checkboxSelect}"/>
+        &nbsp;
+        <ui:inputText label="Opportunity Name" aura:id="opty" value="{!v.OptyName}" disabled="{!v.disableOpty}" />
+    	&nbsp; 
+        <ui:inputCheckbox text="{!selectedUserId}" label="Send Email to the Owner" aura:id="check2" value="" change="{!c.checkboxSelect2}"/>
+    </div>
+    &nbsp;
+    &nbsp;
+    &nbsp;
+       
+    <lightning:button variant="brand" label="Convert" onclick="{!c.convertLead}" class="slds-align--absolute-center"/>
+
+  <!--<div class="slds-modal__footer" >
+    <lightning:button variant="brand" label="Convert" onclick="{!c.onPicklistChange}"/>
+    <lightning:button variant="brand" label="Cancel"/>
+</div>-->
+     <div class="slds "> 
+    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon--right">
+     <aura:if isTrue="{!v.statusCheck}">
+                <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+                    <div class="slds-modal__container">
+                        <div class="slds-modal__content slds-p-around--medium">
+                            <div class="slds-float_right">
+                              <button class="slds-button slds-button--icon-bare" onclick="{!c.closeStatusModel}">
+                                <c:svg class="slds-button__icon" xlinkHref="/resource/slds202/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Remove</span>
+                            </button>
+                     
+                            </div>
+                             &nbsp;
+                            <div class="feedbackData">
+                                <p><b>Please select Status before converting the Lead!</b></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+            </aura:if>
+     <aura:if isTrue="{!v.userCheck}">
+                <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+                    <div class="slds-modal__container">
+                        <div class="slds-modal__content slds-p-around--medium">
+                           <div class="slds-float_right">
+                              <button class="slds-button slds-button--icon-bare" onclick="{!c.closeUserModel}">
+                                <c:svg class="slds-button__icon" xlinkHref="/resource/slds202/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Remove</span>
+                            </button>
+                     
+                            </div>
+                             &nbsp;
+                            <div class="feedbackData">
+                                <p><b>Please select Owner before converting the Lead!</b></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+            </aura:if>
+     <aura:if isTrue="{!v.accError}">
+                <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+                    <div class="slds-modal__container">
+                        <div class="slds-modal__content slds-p-around--medium">
+                            <div class="slds-float_right">
+                              <button class="slds-button slds-button--icon-bare" onclick="{!c.closeAccModel}">
+                                <c:svg class="slds-button__icon" xlinkHref="/resource/slds202/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Remove</span>
+                            </button>
+                     
+                            </div>
+                             &nbsp;
+                            <div class="feedbackData">
+                                <p><b>Please select Existing Acount or create new before converting the Lead!</b></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+            </aura:if>
+ <aura:if isTrue="{!v.isOpen}">
+                <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+                    <div class="slds-modal__container">
+                        <div class="slds-modal__content slds-p-around--medium">
+                           <div class="slds-float_right">
+                              <button class="slds-button slds-button--icon-bare" onclick="{!c.closeModel}">
+                                <c:svg class="slds-button__icon" xlinkHref="/resource/slds202/assets/icons/utility-sprite/svg/symbols.svg#close" />
+                                <span class="slds-assistive-text">Remove</span>
+                            </button>
+                     
+                            </div>
+                             &nbsp;
+                            <div class="feedbackData">
+                                <p><b>Lead Converted Successfully!!</b></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+            </aura:if>
+    </div>
+    </div>
+</aura:component>
